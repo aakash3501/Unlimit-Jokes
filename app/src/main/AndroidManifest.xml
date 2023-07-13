@@ -17,7 +17,7 @@
         android:theme="@style/Theme.UnlimintJokes"
         tools:targetApi="31">
         <activity
-            android:name=".JokesActivity"
+            android:name=".presentation.view.activity.JokesActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
