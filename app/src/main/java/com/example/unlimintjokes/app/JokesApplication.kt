@@ -3,6 +3,7 @@ package com.example.unlimintjokes.app
 import android.app.Application
 import com.example.unlimintjokes.di.modules.apiModule
 import com.example.unlimintjokes.di.modules.apiRepoModule
+import com.example.unlimintjokes.di.modules.dataBaseModule
 import com.example.unlimintjokes.di.modules.networkModule
 import com.example.unlimintjokes.di.modules.useCaseModule
 import com.example.unlimintjokes.di.modules.viewModelModule
@@ -24,7 +25,8 @@ class JokesApplication : Application() {
                 apiModule,
                 apiRepoModule,
                 viewModelModule,
-                useCaseModule
+                useCaseModule,
+                dataBaseModule
             )
         }
     }

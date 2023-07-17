@@ -1,6 +1,7 @@
 package com.example.unlimintjokes.presentation.view.activity
 
 import android.os.Bundle
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.unlimintjokes.databinding.ActivityJokesBinding
 import com.example.unlimintjokes.domain.model.JokeModel
@@ -26,6 +27,7 @@ class JokesActivity : AppCompatActivity() {
             adapter = JokesAdapter(jokeList)
             rvJokes.adapter = adapter
         }
+        viewModel.getSavedJokes()
     }
 
     private fun observeLiveData() {
@@ -39,6 +41,16 @@ class JokesActivity : AppCompatActivity() {
                 adapter.notifyItemInserted(jokeList.size - 1)
             }
         }
+
+        viewModel.jokeListLiveData.observe(this) { jokes ->
+            jokeList.clear()
+            jokeList.addAll(jokes)
+            adapter.notifyDataSetChanged()
+        }
+
+        viewModel.errorMsgLiveData.observe(this) { errorMsg ->
+            Toast.makeText(this, errorMsg, Toast.LENGTH_LONG).show()
+        }
     }
 
     override fun onStart() {
@@ -48,6 +60,7 @@ class JokesActivity : AppCompatActivity() {
 
     override fun onStop() {
         viewModel.stopFetchingJokes()
+        viewModel.saveJokesInDB(jokeList)
         super.onStop()
     }
 }

@@ -9,4 +9,16 @@ class JokesUseCase(private val jokesRepo: JokesRepo) {
     suspend fun getJoke(): Flow<DataResult<JokeModel>> {
         return jokesRepo.getJoke()
     }
+
+    suspend fun getSavedJokes(): List<JokeModel> {
+        return jokesRepo.getSavedJokes()
+    }
+
+    suspend fun saveJokes(jokes: List<JokeModel>) {
+        jokesRepo.saveJokes(jokes)
+    }
+
+    suspend fun deleteAllJokes() {
+        jokesRepo.deleteAllJokes()
+    }
 }

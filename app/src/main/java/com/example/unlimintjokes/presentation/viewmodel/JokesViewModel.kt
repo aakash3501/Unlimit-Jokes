@@ -13,19 +13,23 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 class JokesViewModel(private val jokesUseCase: JokesUseCase) : ViewModel() {
-    var job: Job? = null
+    private var job: Job? = null
+    private val fetchDuration = 60000L // 60 seconds
 
     private var _jokeLiveData = MutableLiveData<JokeModel?>()
     val jokeLiveData: MutableLiveData<JokeModel?> = _jokeLiveData
 
-    private var _jokeListLiveData = MutableLiveData<JokeModel>()
-    val jokeListLiveData: LiveData<JokeModel> = _jokeListLiveData
+    private var _jokeListLiveData = MutableLiveData<List<JokeModel>>()
+    val jokeListLiveData: LiveData<List<JokeModel>> = _jokeListLiveData
+
+    private var _errorMsgLiveData = MutableLiveData<String>()
+    val errorMsgLiveData: LiveData<String> = _errorMsgLiveData
 
     fun startFetchingJokes() {
         job = viewModelScope.launch {
             while (true) {
                 getJokeFromApi()
-                delay(5000L)
+                delay(fetchDuration)
             }
         }
     }
@@ -33,7 +37,9 @@ class JokesViewModel(private val jokesUseCase: JokesUseCase) : ViewModel() {
     private suspend fun getJokeFromApi() {
         jokesUseCase.getJoke().first { result ->
             when (result) {
-                is DataResult.Error -> TODO()
+                is DataResult.Error -> {
+                    _errorMsgLiveData.value = result.error
+                }
                 is DataResult.Success -> {
                     _jokeLiveData.value = result.data
                 }
@@ -45,5 +51,19 @@ class JokesViewModel(private val jokesUseCase: JokesUseCase) : ViewModel() {
     fun stopFetchingJokes() {
         job?.cancel()
         job = null
+    }
+
+    fun getSavedJokes() {
+        viewModelScope.launch {
+            val jokes = jokesUseCase.getSavedJokes()
+            _jokeListLiveData.value = jokes
+        }
+    }
+
+    fun saveJokesInDB(jokeList: MutableList<JokeModel>) {
+        viewModelScope.launch {
+            jokesUseCase.deleteAllJokes()
+            jokesUseCase.saveJokes(jokeList)
+        }
     }
 }
